@@ -66,6 +66,7 @@
         #com { left: 50vw; }
 
         .tab > td > img { height: 11vh; }
+        .tab > td { height: 11vh; }
         .com > td > img { width: 8vw; }
         .cc > td > img { width: 18vw; }
 
@@ -83,6 +84,7 @@
         #com { left: calc(50vw + 32vh); }
 
         .tab > td > img { height: 12vh; }
+        .tab > td { height: 12vh; }
         .com > td > img { width: 6vw; }
         .cc > td > img { height: 25vh; }
 
@@ -121,6 +123,14 @@
     <script src="https://kemuri.ddns.net:11069/socket.io/socket.io.js"></script>
     <script>
       window.onload = () => {
+
+        const g = document.getElementById("game_btn");
+        g.disabled = false;
+        const e = document.getElementById("enter_btn");
+        e.disabled = true;
+        const l = document.getElementById("leave_btn");
+        l.disabled = true;
+
         document.onfullscreenchange = () => {
           if(!document.fullscreenElement){
             document.getElementById("all").classList.add("h");
@@ -148,9 +158,10 @@
         const w = document.getElementById("waiting");
         w.classList.remove("h");
         const e = document.getElementById("enter_btn");
+        const l = document.getElementById("leave_btn");
 
         socket.on("left", () => {
-          alert("Opponent seems to have left the game, you can wait for them to return or reload the page to exit the game.");
+          alert("Opponent seems to have left the game. You may wait for them to return.");
         });
 
         socket.on("uuid", id => {
@@ -161,12 +172,14 @@
         socket.on("game", () => {
           w.classList.add("h");
           e.disabled = false;
+          l.disabled = false;
         });
         socket.on("disconnect", () => {
           w.classList.add("h");
           g.disabled = false;
           e.disabled = true;
-          alert("Connection lost!");
+          l.disabled = true;
+          alert("Connection closed.");
         });
 
         const ys = document.getElementById("you_stats");
@@ -287,6 +300,10 @@
         all.classList.remove("h");
         all.requestFullscreen({ "navigationUI": "hide" });
       }
+
+      function exit(){
+        socket.emit("leave");
+      }
       
     </script>
 
@@ -299,7 +316,8 @@
       <img style="height:min(80vw,40vh)" src="img/manus.jpg"/><br>
       <input type="button" value="play" id="game_btn" onclick="game()">
       <span id="waiting" class="h">Waiting for an opponent...</span>
-      <input type="button" value="enter" id="enter_btn" onclick="full()" disabled>
+      <input type="button" value="enter" id="enter_btn" onclick="full()">
+      <input type="button" value="leave" id="leave_btn">
     </div>
     <div id="all" class="h">
       <table id="middle">

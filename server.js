@@ -477,6 +477,11 @@ async function theGame(socket, uuid){
       delete games[uuid];
 
       con.socket.emit("game");
+
+      con.socket.on("leave", () => {
+        exit();
+      });
+
       con.socket.on("disconnect", () => {
         games[uuid] = new EventEmitter();
         games[uuid].on("rejoin", (socket) => {
@@ -521,6 +526,11 @@ async function theGame(socket, uuid){
       delete games[ouuid];
 
       con.oppo.emit("game");
+
+      con.oppo.on("leave", () => {
+        exit();
+      });
+
       con.oppo.on("disconnect", () => {
         games[ouuid] = new EventEmitter();
         games[ouuid].on("rejoin", (oppo) => {
