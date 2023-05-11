@@ -5,6 +5,10 @@ Turn-based Card Game about Elements and Alchemy!
 Developed this because was too lazy to finish my other projects
 but needed a small project to entertain myself
 
+The game is accessible here: [github pages](https://gxlg.github.io/res-deorum/).
+If the server is not reachable, that means I restarted my server
+and forgot to host the game. Please contact me on Discord about this.
+
 # Elements
 
 Five base elements: Ignis, Aqua, Aer, Terra, Vita

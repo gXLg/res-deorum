@@ -24,7 +24,7 @@
       #all {
         width: 100%;
         height: 100%;
-        background-image: url("/img/ludus.jpg");
+        background-image: url("img/ludus.jpg");
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -203,7 +203,7 @@
                 if(e[i]){
                   de.innerHTML = "<img " +
                     (e[i][0] == "?" ? "class=\"nebula\" " : "") +
-                    "src=\"/img/" + (e[i][0] == "?" ? e[i].slice(1) : e[i]) +
+                    "src=\"img/" + (e[i][0] == "?" ? e[i].slice(1) : e[i]) +
                     ".jpg\"/>";
                 } else { de.innerHTML = ""; }
               }
@@ -284,7 +284,7 @@
     <div id="start">
       <h1>Res Deorum</h1>
       <h2>Everything is in your hands.</h2>
-      <img style="height:50vw;" src="/img/manus.jpg"/><br>
+      <img style="height:50vw;" src="img/manus.jpg"/><br>
       <input type="button" value="play" id="game_btn" onclick="game()">
       <span id="waiting" class="h">Waiting for an opponent...</span>
       <input type="button" value="enter" id="enter_btn" onclick="full()" disabled>
@@ -292,8 +292,8 @@
     <div id="all" class="h">
       <table id="middle">
         <tr>
-          <td><img id="ttab" class="mp" src="/img/tabula.jpg"/></td>
-          <td><img id="tcom" class="mp" src="/img/commutatio.jpg"/></td>
+          <td><img id="ttab" class="mp" src="img/tabula.jpg"/></td>
+          <td><img id="tcom" class="mp" src="img/commutatio.jpg"/></td>
         </tr>
       </table>
       <table class="mc" id="tab">
