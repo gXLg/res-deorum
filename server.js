@@ -2,6 +2,8 @@ const express = require("express");
 const https = require("https");
 const { Server } = require("socket.io");
 const fs = require("fs");
+const { randomUUID } = require("crypto");
+const { EventEmitter } = require("events");
 
 const cred = {
   "key": fs.readFileSync("./cert/privkey.pem", "utf8"),
@@ -26,6 +28,7 @@ function getCards(n){
 }
 
 const free = [];
+const games = { };
 
 io.on("connection", async socket => {
   console.log("Connected", socket.id);
@@ -35,21 +38,29 @@ io.on("connection", async socket => {
     console.log("Disconnected", socket.id);
   });
 
-  if(!free.length) free.push(socket);
-  else {
-    const oppo = free.pop();
-    oppo.emit("game");
-    socket.emit("game");
+  socket.on("first", () => {
+    socket.emit("uuid", randomUUID());
+  });
 
-    oppo.on("disconnect", () => {
-      socket.disconnect(true);
-    });
-    socket.on("disconnect", () => {
-      oppo.disconnect(true);
-    });
+  socket.on("login", uuid => theGame(socket, uuid));
+});
+
+async function theGame(socket, uuid){
+
+  if(uuid in games){
+    games[uuid].emit("rejoin", socket);
+    return;
+  }
+
+  if(!free.length) free.push([socket, uuid]);
+  else {
+
+    const [oppo, ouuid] = free.pop();
+    const con = { oppo, socket };
+
+    let turn = Math.floor(Math.random() * 2);
 
     const comm = [];
-
     const game = {
       "oppo": {
         "hp": 40,
@@ -66,6 +77,12 @@ io.on("connection", async socket => {
         "tab": []
       }
     };
+
+    con.socket = socket;
+    registerSocket();
+    con.oppo = oppo;
+    registerOppo();
+    update();
 
     function update(){
       const t = ["oppo", "socket"];
@@ -87,18 +104,14 @@ io.on("connection", async socket => {
         const oppo_cards = game[opp].cards.map(j => j[2] + j[i]);
         const oppo_tab = game[opp].tab.map(j => j[2] + j[i]);
 
-        [oppo, socket][i].emit("update", {
+        [con.oppo, con.socket][i].emit("update", {
           com, you_hp, you_buf, you_debuf, you_cards, you_tab,
           oppo_hp, oppo_buf, oppo_debuf, oppo_cards, oppo_tab
         });
       }
+      [con.oppo, con.socket][turn].emit("you");
+      [con.oppo, con.socket][1 - turn].emit("oppo");
     }
-    update();
-
-    let turn = Math.floor(Math.random() * 2);
-    [oppo, socket][turn].emit("you");
-    [oppo, socket][1 - turn].emit("oppo");
-
 
     function reduce(){
       const t = ["oppo", "socket"][turn];
@@ -460,73 +473,102 @@ io.on("connection", async socket => {
 
     let working = false;
 
-    oppo.on("turn", async data => {
-      if(working) return;
-      if(turn == 1) return;
+    function registerSocket(){
+      delete games[uuid];
 
-      working = true;
-      const succ = await step(data);
-      working = false;
-      if(!succ) return;
+      con.socket.emit("game");
+      con.socket.on("disconnect", () => {
+        games[uuid] = new EventEmitter();
+        games[uuid].on("rejoin", (socket) => {
+          con.socket = socket;
+          registerSocket();
+          update();
+        });
+        if(games[uuid] && games[ouuid]) exit();
+        else con.oppo.emit("left");
+      });
+      con.socket.on("turn", async data => {
+        if(working) return;
+        if(turn == 0) return;
 
-      reduce();
-      update();
+        working = true;
+        const succ = await step(data);
+        working = false;
+        if(!succ) return;
 
-      if(game.oppo.hp == 0){
-        oppo.emit("lose");
-        socket.emit("win");
-        oppo.disconnect(true);
-        socket.disconnect(true);
-        return;
-      }
-      if(game.socket.hp == 0){
-        oppo.emit("win");
-        socket.emit("lose");
-        oppo.disconnect(true);
-        socket.disconnect(true);
-        return;
-      }
+        reduce();
+        turn = 0;
+        update();
 
-      socket.emit("you");
-      oppo.emit("oppo");
-      turn = 1;
-    });
+        if(game.oppo.hp == 0){
+          con.oppo.emit("lose");
+          con.socket.emit("win");
+          con.oppo.disconnect(true);
+          con.socket.disconnect(true);
+          return;
+        }
+        if(game.socket.hp == 0){
+          con.oppo.emit("win");
+          con.socket.emit("lose");
+          con.oppo.disconnect(true);
+          con.socket.disconnect(true);
+          return;
+        }
+      });
+    }
 
-    socket.on("turn", async data => {
-      if(working) return;
-      if(turn == 0) return;
+    function registerOppo(){
+      delete games[ouuid];
 
-      working = true;
-      const succ = await step(data);
-      working = false;
-      if(!succ) return;
+      con.oppo.emit("game");
+      con.oppo.on("disconnect", () => {
+        games[ouuid] = new EventEmitter();
+        games[ouuid].on("rejoin", (oppo) => {
+          con.oppo = oppo;
+          registerOppo();
+          update();
+        });
+        if(games[uuid] && games[ouuid]) exit();
+        else con.socket.emit("left");
+      });
+      con.oppo.on("turn", async data => {
+        if(working) return;
+        if(turn == 1) return;
 
-      reduce();
-      update();
+        working = true;
+        const succ = await step(data);
+        working = false;
+        if(!succ) return;
 
-      if(game.oppo.hp == 0){
-        oppo.emit("lose");
-        socket.emit("win");
-        oppo.disconnect(true);
-        socket.disconnect(true);
-        return;
-      }
-      if(game.socket.hp == 0){
-        oppo.emit("win");
-        socket.emit("lose");
-        oppo.disconnect(true);
-        socket.disconnect(true);
-        return;
-      }
+        reduce();
+        turn = 1;
+        update();
 
-      oppo.emit("you");
-      socket.emit("oppo");
-      turn = 0;
-    });
+        if(game.oppo.hp == 0){
+          con.oppo.emit("lose");
+          con.socket.emit("win");
+          con.oppo.disconnect(true);
+          con.socket.disconnect(true);
+          return;
+        }
+        if(game.socket.hp == 0){
+          con.oppo.emit("win");
+          con.socket.emit("lose");
+          con.oppo.disconnect(true);
+          con.socket.disconnect(true);
+          return;
+        }
+      });
+    }
 
+    function exit(){
+      con.oppo.disconnect(true);
+      con.socket.disconnect(true);
+      delete games[ouuid];
+      delete games[uuid];
+    }
   }
-
-});
+}
 
 server.listen(11069, () => {
   console.log("Server started!");

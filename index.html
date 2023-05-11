@@ -135,6 +135,9 @@
 
         try {
           socket = io("https://kemuri.ddns.net:11069");
+          const id = localStorage.getItem("uuid");
+          if(!id) socket.emit("first");
+          else socket.emit("login", id);
         } catch(err) {
           alert("Cannot connect to the game server :(");
           return;
@@ -145,6 +148,15 @@
         const w = document.getElementById("waiting");
         w.classList.remove("h");
         const e = document.getElementById("enter_btn");
+
+        socket.on("left", () => {
+          alert("Opponent seems to have left the game, you can wait for them to return or reload the page to exit the game.");
+        });
+
+        socket.on("uuid", id => {
+          localStorage.setItem("uuid", id);
+          socket.emit("login", id);
+        });
 
         socket.on("game", () => {
           w.classList.add("h");
@@ -284,7 +296,7 @@
     <div id="start">
       <h1>Res Deorum</h1>
       <h2>Everything is in your hands.</h2>
-      <img style="height:50vw;" src="img/manus.jpg"/><br>
+      <img style="height:min(80vw,40vh)" src="img/manus.jpg"/><br>
       <input type="button" value="play" id="game_btn" onclick="game()">
       <span id="waiting" class="h">Waiting for an opponent...</span>
       <input type="button" value="enter" id="enter_btn" onclick="full()" disabled>
