@@ -472,6 +472,7 @@ async function theGame(socket, uuid){
     }
 
     let working = false;
+    let left = false;
 
     function registerSocket(){
       delete games[uuid];
@@ -479,12 +480,17 @@ async function theGame(socket, uuid){
       con.socket.emit("game");
 
       con.socket.on("leave", () => {
+        left = true;
+        delete games[ouuid];
+        delete games[uuid];
         exit();
       });
 
       con.socket.on("disconnect", () => {
-        if(!games[uuid] == !games[ouuid]) exit();
-        else {
+        if(games[ouuid] || left){
+          delete games[ouuid];
+          exit();
+        } else {
           games[uuid] = new EventEmitter();
           games[uuid].on("rejoin", (socket) => {
             con.socket = socket;
@@ -528,12 +534,17 @@ async function theGame(socket, uuid){
       con.oppo.emit("game");
 
       con.oppo.on("leave", () => {
+        left = true;
+        delete games[ouuid];
+        delete games[uuid];
         exit();
       });
 
       con.oppo.on("disconnect", () => {
-        if(!games[uuid] == !games[ouuid]) exit();
-        else {
+        if(games[uuid] || left){
+          delete games[uuid];
+          exit();
+        } else {
           games[ouuid] = new EventEmitter();
           games[ouuid].on("rejoin", (oppo) => {
             con.oppo = oppo;
@@ -574,8 +585,6 @@ async function theGame(socket, uuid){
     function exit(){
       con.oppo.disconnect(true);
       con.socket.disconnect(true);
-      delete games[ouuid];
-      delete games[uuid];
     }
   }
 }
