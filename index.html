@@ -1,0 +1,391 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+      :root {
+        touch-action: pan-x pan-y;
+        height: 100% 
+      }
+
+      html, body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0px;
+      }
+
+      #start {
+        width: 100%;
+        height: 100%;
+      }
+
+      #all {
+        width: 100%;
+        height: 100%;
+        background-image: url("/img/ludus.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+      }
+
+      #middle {
+        width: 100%;
+        position: absolute;
+        top: 35vh;
+        height: 25vh;
+        -background: #33ff66;
+      }
+
+      td > img { border-radius: 10px; }
+
+      .mp {
+        height: 23vh;
+      }
+      .mc { position: absolute; height: 25vh; top: 35vh; }
+
+      .cards { position: absolute; height: 20vh; }
+      #oppo { top: 0vh; }
+      #you { bottom: 0vh; }
+
+      #you_stats, #oppo_stats {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      @media screen and (orientation: portrait) {
+
+        .mc {
+          width: 50vw;
+          background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        #com { left: 50vw; }
+
+        .tab > td > img { height: 11vh; }
+        .com > td > img { width: 8vw; }
+        .cc > td > img { width: 18vw; }
+
+        #you_stats { bottom: 20vh; height: 10vh; }
+
+        #oppo_stats { top: 20vh; height: 10vh; }
+
+      }
+
+      @media screen and (orientation: landscape) {
+
+        .mc { width: calc(50vw - 32vh); }
+
+        #tab { left: 32vh; }
+        #com { left: calc(50vw + 32vh); }
+
+        .tab > td > img { height: 12vh; }
+        .com > td > img { width: 6vw; }
+        .cc > td > img { height: 25vh; }
+
+        #you_stats {
+          bottom: 0vh;
+          left: 50vw;
+          height: 25vh;
+        }
+
+        #oppo_stats {
+          top: 0vh;
+          left: 50vw;
+          height: 25vh;
+        }
+
+      }
+
+      .h {
+        display: none;
+      }
+
+      td {
+        --background: #0000ff;
+      }
+
+
+      .nebula {
+        box-shadow: 0px 0px 5px 5px #777;
+      }
+      .glow {
+        box-shadow: 0px 0px 5px 5px #DB7;
+      }
+
+    </style>
+
+    <script src="https://kemuri.ddns.net:11069/socket.io/socket.io.js"></script>
+    <script>
+      window.onload = () => {
+        document.onfullscreenchange = () => {
+          if(!document.fullscreenElement){
+            document.getElementById("all").classList.add("h");
+          }
+        };
+      };
+
+      let socket;
+      let turn;
+
+      function game(){
+
+        try {
+          socket = io("https://kemuri.ddns.net:11069");
+        } catch(err) {
+          alert("Cannot connect to the game server :(");
+          return;
+        }
+
+        const g = document.getElementById("game_btn");
+        g.disabled = true;
+        const w = document.getElementById("waiting");
+        w.classList.remove("h");
+        const e = document.getElementById("enter_btn");
+
+        socket.on("game", () => {
+          w.classList.add("h");
+          e.disabled = false;
+        });
+        socket.on("disconnect", () => {
+          w.classList.add("h");
+          g.disabled = false;
+          e.disabled = true;
+          alert("Connection lost!");
+        });
+
+        const ys = document.getElementById("you_stats");
+        const os = document.getElementById("oppo_stats");
+
+        socket.on("you", () => {
+          turn = 0;
+          ys.classList.add("glow");
+          os.classList.remove("glow");
+        });
+        socket.on("oppo", () => {
+          turn = 1;
+          os.classList.add("glow");
+          ys.classList.remove("glow");
+        });
+
+        socket.on("win", () => {
+          socket.disconnect();
+          alert("[VICTORY] You beat your opponent!");
+        });
+        socket.on("lose", () => {
+          socket.disconnect();
+          alert("[DEFEAT] You was beaten!");
+        });
+
+        socket.on("update", data => {
+          for(d in data){
+            if(d.match(/hp/)){
+              document.getElementById(d).innerHTML = data[d];
+            } else if(d.match(/buf/)){
+              const e = data[d];
+              for(let i = 0; i < 6; i ++){
+                const id = d + "_" + i;
+                const de = document.getElementById(id);
+                if(e[i]){
+                  de.innerHTML = (
+                    e[i][0] == "?"
+                  ) ? "<span class=\"nebula\">" + e[i].slice(1) + "</span>" : e[i];
+                } else { de.innerHTML = ""; }
+              }
+            } else {
+              const e = data[d];
+              for(let i = 0; i < (d.match(/tab/) ? 2 : 5); i ++){
+                const id = d + "_" + i;
+                const de = document.getElementById(id);
+                if(e[i]){
+                  de.innerHTML = "<img " +
+                    (e[i][0] == "?" ? "class=\"nebula\" " : "") +
+                    "src=\"/img/" + (e[i][0] == "?" ? e[i].slice(1) : e[i]) +
+                    ".jpg\"/>";
+                } else { de.innerHTML = ""; }
+              }
+            }
+          }
+
+          for(let i = 0; i < 5; i ++){
+            const d = document.getElementById("you_cards_" + i).children[0];
+            if(d){
+              d.classList.remove("glow");
+              d.onclick = () => select(i);
+            }
+          }
+          for(let i = 0; i < 5; i ++){
+            const d = document.getElementById("com_" + i).children[0];
+            if(d) d.onclick = () => comm(i);
+          }
+          document.getElementById("com").onclick = () => comm(null);
+          document.getElementById("tab").onclick = () => move("tab");
+          document.getElementById("tcom").onclick = () => comm(null);
+          document.getElementById("ttab").onclick = () => move("tab");
+          document.getElementById("you_stats").onclick = () => move("you");
+          document.getElementById("oppo_stats").onclick = () => move("oppo");
+
+        });
+
+        let sel = null;
+        function select(num){
+          if(turn == 1) return;
+          if(sel != null)
+            document.getElementById("you_cards_" + sel)
+              .children[0].classList.remove("glow");
+          if(num == sel){
+            sel = null;
+            return;
+          }
+          sel = num;
+          if(num == null) return;
+          const d = document.getElementById("you_cards_" + sel);
+          if(d.innerHTML != "") d.children[0].classList.add("glow");
+        }
+
+        function comm(num){
+          if(turn == 1) return;
+          if(sel == null) return;
+          if(num == null){
+            socket.emit("turn", [sel, "com", null]);
+            select(null);
+          } else {
+            const d = document.getElementById("com_" + num);
+            if(d.innerHTML != ""){
+              socket.emit("turn", [sel, "com", num]);
+              select(null);
+            } else comm(null);
+          }
+        }
+
+        function move(d){
+          if(turn == 1) return;
+          if(sel == null) return;
+          socket.emit("turn", [sel, d, null]);
+          select(null);
+        }
+
+      }
+
+      function full(){
+        const all = document.getElementById("all");
+        all.classList.remove("h");
+        all.requestFullscreen({ "navigationUI": "hide" });
+      }
+      
+    </script>
+
+  </head>
+
+  <body>
+    <div id="start">
+      <h1>Res Deorum</h1>
+      <h2>Everything is in your hands.</h2>
+      <img style="height:50vw;" src="/img/manus.jpg"/><br>
+      <input type="button" value="play" id="game_btn" onclick="game()">
+      <span id="waiting" class="h">Waiting for an opponent...</span>
+      <input type="button" value="enter" id="enter_btn" onclick="full()" disabled>
+    </div>
+    <div id="all" class="h">
+      <table id="middle">
+        <tr>
+          <td><img id="ttab" class="mp" src="/img/tabula.jpg"/></td>
+          <td><img id="tcom" class="mp" src="/img/commutatio.jpg"/></td>
+        </tr>
+      </table>
+      <table class="mc" id="tab">
+        <tr class="tab">
+          <td id="oppo_tab_0"></td>
+          <td id="oppo_tab_1"></td>
+        </tr>
+        <tr class="tab">
+          <td id="you_tab_0"></td>
+          <td id="you_tab_1"></td>
+        </tr>
+      </table>
+      <table class="mc" id="com">
+        <tr class="com">
+          <td id="com_0"></td>
+          <td id="com_1"></td>
+          <td id="com_2"></td>
+          <td id="com_3"></td>
+          <td id="com_4"></td>
+        </tr>
+      </table>
+
+
+      <table class="cards" id="oppo">
+        <tr class="cc">
+          <td id="oppo_cards_0"></td>
+          <td id="oppo_cards_1"></td>
+          <td id="oppo_cards_2"></td>
+          <td id="oppo_cards_3"></td>
+          <td id="oppo_cards_4"></td>
+        </tr>
+      </table>
+      <table class="cards" id="you">
+        <tr class="cc">
+          <td id="you_cards_0"></td>
+          <td id="you_cards_1"></td>
+          <td id="you_cards_2"></td>
+          <td id="you_cards_3"></td>
+          <td id="you_cards_4"></td>
+        </tr>
+      </table>
+
+      <table id="you_stats">
+        <tr>
+          <th>HP</th>
+          <td id="you_hp"></td>
+        </tr>
+        <tr>
+          <th>BUF</th>
+          <td id="you_buf_0"></td>
+          <td id="you_buf_1"></td>
+          <td id="you_buf_2"></td>
+          <td id="you_buf_3"></td>
+          <td id="you_buf_4"></td>
+          <td id="you_buf_5"></td>
+        </tr>
+        <tr>
+          <th>DEBUF</th>
+          <td id="you_debuf_0"></td>
+          <td id="you_debuf_1"></td>
+          <td id="you_debuf_2"></td>
+          <td id="you_debuf_3"></td>
+          <td id="you_debuf_4"></td>
+          <td id="you_debuf_5"></td>
+        </tr>
+      </table>
+
+      <table id="oppo_stats">
+        <tr>
+          <th>HP</th>
+          <td id="oppo_hp"></td>
+        </tr>
+        <tr>
+          <th>BUF</th>
+          <td id="oppo_buf_0"></td>
+          <td id="oppo_buf_1"></td>
+          <td id="oppo_buf_2"></td>
+          <td id="oppo_buf_3"></td>
+          <td id="oppo_buf_4"></td>
+          <td id="oppo_buf_5"></td>
+        </tr>
+        <tr>
+          <th>DEBUF</th>
+          <td id="oppo_debuf_0"></td>
+          <td id="oppo_debuf_1"></td>
+          <td id="oppo_debuf_2"></td>
+          <td id="oppo_debuf_3"></td>
+          <td id="oppo_debuf_4"></td>
+          <td id="oppo_debuf_5"></td>
+        </tr>
+      </table>
+
+    </div>
+  </body>
+</html>

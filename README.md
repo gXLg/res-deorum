@@ -1,2 +1,87 @@
-# res-deorum
+# Res Deorum
+
 Turn-based Card Game about Elements and Alchemy!
+
+Developed this because was too lazy to finish my other projects
+but needed a small project to entertain myself
+
+# Elements
+
+Five base elements: Ignis, Aqua, Aer, Terra, Vita
+
+In begin:
+* Infinitely cards in deck
+* For each element: 23%
+* Vita: 8%
+* Two players, each gets 5 cards
+
+Each turn:
+* Need to use one card
+* Using a card will show it to the other player
+* After a turn the player should always have 5 or less cards,
+more cards are given if less than 5.
+
+Using a card:
+* Use on enemy
+* Put to "Tabula Alchimiae"
+* Use on self
+* Put into "Commutatio"
+
+Exchange:
+* Open cards in the "Commutatio", which can be added
+or exchanged against other cards
+* Maximum 5 cards can be put
+
+Alchemy:
+* Turns two elements into a new element
+* Second card can only be added to the table if the resulting
+pair would produce a new element following a recipe
+
+Strength Circle:
+* Aqua beats Ignis
+* Terra beats Aqua
+* Aer beats Terra
+* Ignis beats Aer
+
+```
+  v/  Aqua <\
+Ignis     Terra
+  \>  Aer  /^
+```
+
+Recipes:
+
+Stronger:
+* Ignis + Aer   = Fulgur    (Lightning)
+* Aqua  + Ignis = Vapor     (Steam)
+* Aer   + Terra = Tempestas (Storm)
+* Terra + Ignis = Tremor    (Earthquake)
+
+Longer/Protectors:
+* Ignis + Vita  = Phoenix
+* Aqua  + Vita  = Syrena    (Mermaid)
+* Aer   + Vita  = Mediocris (Fairy)
+* Terra + Vita  = Colossus  (Titan)
+* Vita  + Vita  = Lumen     (Light)
+
+Special:
+* Aqua  + Aer   = Nebula    (Fog)
+* Aqua  + Terra = Lutum     (Mud)
+
+Use on self:
+* Vita: regen 2 HP
+* Elements (same as Stronger): resist effect against one attack
+* Protectors: resist effect for next 3 attacks
+* Lumen: regen 6 HP
+* Nebula: next 2 cards don't open to opponent
+* Lutum: next attack work only if basic attack (not longer or stronger)
+
+Use on opponent:
+* Vita: dmg 1 HP (always)
+* Lumen: dmg 4 HP (always)
+* Elements: dmg 2 HP if not resist effect else resist effect reduce
+* Stronger: dmg 6 HP if not ...^
+* Longer: dmg 2 HP for the next 3 rounds (effects mechanics still apply)
+* Nebula: next attack can not be resisted, but has 30% chance
+that will miss (but Lutum still works)
+* Lutum: cannot use alchemy in the next 2 moves

@@ -1,0 +1,23 @@
+{
+  "name": "res-deorum",
+  "version": "1.0.0",
+  "description": "Turn-based Card Game about Elements and Alchemy!",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gXLg/res-deorum.git"
+  },
+  "author": "gXLg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gXLg/res-deorum/issues"
+  },
+  "homepage": "https://github.com/gXLg/res-deorum#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1"
+  }
+}
