@@ -483,14 +483,16 @@ async function theGame(socket, uuid){
       });
 
       con.socket.on("disconnect", () => {
-        games[uuid] = new EventEmitter();
-        games[uuid].on("rejoin", (socket) => {
-          con.socket = socket;
-          registerSocket();
-          update();
-        });
-        if(games[uuid] && games[ouuid]) exit();
-        else con.oppo.emit("left");
+        if(!games[uuid] == !games[ouuid]) exit();
+        else {
+          games[uuid] = new EventEmitter();
+          games[uuid].on("rejoin", (socket) => {
+            con.socket = socket;
+            registerSocket();
+            update();
+          });
+          con.oppo.emit("left");
+        }
       });
       con.socket.on("turn", async data => {
         if(working) return;
@@ -508,15 +510,13 @@ async function theGame(socket, uuid){
         if(game.oppo.hp == 0){
           con.oppo.emit("lose");
           con.socket.emit("win");
-          con.oppo.disconnect(true);
-          con.socket.disconnect(true);
+          exit();
           return;
         }
         if(game.socket.hp == 0){
           con.oppo.emit("win");
           con.socket.emit("lose");
-          con.oppo.disconnect(true);
-          con.socket.disconnect(true);
+          exit();
           return;
         }
       });
@@ -532,14 +532,16 @@ async function theGame(socket, uuid){
       });
 
       con.oppo.on("disconnect", () => {
-        games[ouuid] = new EventEmitter();
-        games[ouuid].on("rejoin", (oppo) => {
-          con.oppo = oppo;
-          registerOppo();
-          update();
-        });
-        if(games[uuid] && games[ouuid]) exit();
-        else con.socket.emit("left");
+        if(!games[uuid] == !games[ouuid]) exit();
+        else {
+          games[ouuid] = new EventEmitter();
+          games[ouuid].on("rejoin", (oppo) => {
+            con.oppo = oppo;
+            registerOppo();
+            update();
+          });
+          con.socket.emit("left");
+        }
       });
       con.oppo.on("turn", async data => {
         if(working) return;
@@ -557,15 +559,13 @@ async function theGame(socket, uuid){
         if(game.oppo.hp == 0){
           con.oppo.emit("lose");
           con.socket.emit("win");
-          con.oppo.disconnect(true);
-          con.socket.disconnect(true);
+          exit();
           return;
         }
         if(game.socket.hp == 0){
           con.oppo.emit("win");
           con.socket.emit("lose");
-          con.oppo.disconnect(true);
-          con.socket.disconnect(true);
+          exit();
           return;
         }
       });
