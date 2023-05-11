@@ -27,14 +27,19 @@ function getCards(n){
   return n == 1 ? a[0] : a;
 }
 
-const free = [];
+const free = { };
 const games = { };
+const rooms = { };
 
 io.on("connection", async socket => {
   console.log("Connected", socket.id);
   socket.on("disconnect", () => {
-    const index = free.indexOf(socket);
-    if(~index) free.splice(index, 1);
+    const room = rooms[socket.id];
+    if(room in free){
+      const index = free[room].indexOf(socket);
+      if(~index) free[room].splice(index, 1);
+    }
+    delete rooms[socket.id];
     console.log("Disconnected", socket.id);
   });
 
@@ -42,20 +47,23 @@ io.on("connection", async socket => {
     socket.emit("uuid", randomUUID());
   });
 
-  socket.on("login", uuid => theGame(socket, uuid));
+  socket.on("login", (uuid, room) => theGame(socket, uuid, room ?? ""));
 });
 
-async function theGame(socket, uuid){
+async function theGame(socket, uuid, room){
+
+  rooms[socket.id] = room;
 
   if(uuid in games){
     games[uuid].emit("rejoin", socket);
     return;
   }
 
-  if(!free.length) free.push([socket, uuid]);
+  if(!(room in free)) free[room] = [];
+  if(!free[room].length) free[room].push([socket, uuid]);
   else {
 
-    const [oppo, ouuid] = free.pop();
+    const [oppo, ouuid] = free[room].pop();
     const con = { oppo, socket };
 
     let turn = Math.floor(Math.random() * 2);

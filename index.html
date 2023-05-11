@@ -143,11 +143,13 @@
 
       function game(){
 
+        const room = document.getElementById("room").value;
+
         try {
           socket = io("https://kemuri.ddns.net:11069");
           const id = localStorage.getItem("uuid");
           if(!id) socket.emit("first");
-          else socket.emit("login", id);
+          else socket.emit("login", id, room);
         } catch(err) {
           alert("Cannot connect to the game server :(");
           return;
@@ -166,7 +168,7 @@
 
         socket.on("uuid", id => {
           localStorage.setItem("uuid", id);
-          socket.emit("login", id);
+          socket.emit("login", id, room);
         });
 
         socket.on("game", () => {
@@ -317,7 +319,8 @@
       <input type="button" value="play" id="game_btn" onclick="game()">
       <span id="waiting" class="h">Waiting for an opponent...</span>
       <input type="button" value="enter" id="enter_btn" onclick="full()">
-      <input type="button" value="leave" id="leave_btn" onclick="exit()">
+      <input type="button" value="leave" id="leave_btn" onclick="exit()"><br>
+      <input type="text" id="room" placeholder="private room code">
     </div>
     <div id="all" class="h">
       <table id="middle">
