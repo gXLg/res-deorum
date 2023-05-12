@@ -77,10 +77,10 @@ Special:
 * Aqua  + Terra = Lutum     (Mud)
 
 Use on self:
-* Vita: regen 2 HP
+* Vita: regen 3 HP
 * Elements (same as Stronger): resist effect against one attack
 * Protectors: resist effect for next 3 attacks
-* Lumen: regen 8 HP
+* Lumen: regen 9 HP
 * Nebula: next 2 cards don't open to opponent
 * Lutum: next attack work only if basic attack (not longer or stronger)
 

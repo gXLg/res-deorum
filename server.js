@@ -376,7 +376,7 @@ async function theGame(socket, uuid, room){
         game[t].cards.push(newc);
 
         if(ef == "vita"){
-          game[t].hp = Math.min(game[t].hp + 2 * len, 50);
+          game[t].hp = Math.min(game[t].hp + 3 * len, 50);
 
           game[t].dmg = [[
             "+" + (2 * len) + "HP",
