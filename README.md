@@ -76,7 +76,7 @@ Use on self:
 * Vita: regen 2 HP
 * Elements (same as Stronger): resist effect against one attack
 * Protectors: resist effect for next 3 attacks
-* Lumen: regen 6 HP
+* Lumen: regen 8 HP
 * Nebula: next 2 cards don't open to opponent
 * Lutum: next attack work only if basic attack (not longer or stronger)
 
@@ -84,8 +84,8 @@ Use on opponent:
 * Vita: dmg 1 HP (always)
 * Lumen: dmg 4 HP (always)
 * Elements: dmg 2 HP if not resist effect else resist effect reduce
-* Stronger: dmg 6 HP if not ...^
-* Longer: dmg 2 HP for the next 3 rounds (effects mechanics still apply)
+* Stronger: dmg 8 HP if not ...^
+* Longer: dmg 3 HP for the next 3 rounds (effects mechanics still apply)
 * Nebula: next attack can not be resisted, but has 30% chance
 that will miss (but Lutum still works)
 * Lutum: cannot use alchemy in the next 2 moves

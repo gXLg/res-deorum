@@ -58,8 +58,11 @@ async function theGame(socket, uuid, room){
   ids[socket.id] = uuid;
 
   if(uuid in games){
+    console.log(uuid, "rejoined");
     games[uuid].emit("rejoin", socket);
     return;
+  } else {
+    console.log(uuid, "joined" + (room == "" ? room : " in " + room));
   }
 
   if(!(room in free)) free[room] = [];
@@ -75,18 +78,22 @@ async function theGame(socket, uuid, room){
     const comm = [];
     const game = {
       "oppo": {
-        "hp": 40,
+        "hp": 50,
         "buf": [],
         "deb": [],
         "cards": getCards(5).map(c => [c, "res", ""]),
-        "tab": []
+        "tab": [],
+        "log": [],
+        "dmg": []
       },
       "socket": {
-        "hp": 40,
+        "hp": 50,
         "buf": [],
         "deb": [],
         "cards": getCards(5).map(c => ["res", c, ""]),
-        "tab": []
+        "tab": [],
+        "log": [],
+        "dmg": []
       }
     };
 
@@ -116,9 +123,15 @@ async function theGame(socket, uuid, room){
         const oppo_cards = game[opp].cards.map(j => j[2] + j[i]);
         const oppo_tab = game[opp].tab.map(j => j[2] + j[i]);
 
+        const you_log = game[you].log[i];
+        const you_dmg = game[you].dmg.map(j => j[i]);
+        const oppo_log = game[opp].log[i];
+        const oppo_dmg = game[opp].dmg.map(j => j[i]);
+
         [con.oppo, con.socket][i].emit("update", {
           com, you_hp, you_buf, you_debuf, you_cards, you_tab,
-          oppo_hp, oppo_buf, oppo_debuf, oppo_cards, oppo_tab
+          oppo_hp, oppo_buf, oppo_debuf, oppo_cards, oppo_tab,
+          you_log, oppo_log, you_dmg, oppo_dmg
         });
       }
       [con.oppo, con.socket][turn].emit("you");
@@ -127,6 +140,7 @@ async function theGame(socket, uuid, room){
 
     function reduce(){
       const t = ["oppo", "socket"][turn];
+
       for(const debuf of game[t].deb){
         const n = parseInt(debuf[1 - turn].match(/\d+/)[0]) - 1;
         const ef = debuf[1 - turn].match(/[A-Z][a-z]+/)[0];
@@ -151,8 +165,12 @@ async function theGame(socket, uuid, room){
             nebula[1 - turn] = "Nebula " + n;
             if(nebula[2] == "") nebula[turn] = nebula[1 - turn];
           }
-          if(Math.floor(Math.random() * 100) < 70)
-            game[t].hp = Math.max(game[t].hp - 2, 0);
+          if(Math.floor(Math.random() * 100) < 70){
+            const d = ["-3HP (" + ef + ")", "-3HP (" + ef + ")"];
+            if(debuf[2] == "?") d[turn] = "???";
+            game[t].dmg.push(d);
+            game[t].hp = Math.max(game[t].hp - 3, 0);
+          }
         } else {
           let dis = false;
           let dec;
@@ -178,10 +196,30 @@ async function theGame(socket, uuid, room){
               if(resist[2] == "") resist[1 - turn] = resist[turn];
             }
           } else {
-            game[t].hp = Math.max(game[t].hp - 2, 0);
+            const d = ["-3HP (" + ef + ")", "-3HP (" + ef + ")"];
+            if(debuf[2] == "?") d[turn] = "-3HP (???)";
+            game[t].dmg.push(d);
+            game[t].hp = Math.max(game[t].hp - 3, 0);
           }
         }
       }
+      const nebula = game[t].buf.find(b => b[turn].match(/Nebula/));
+      if(nebula){
+        const n = parseInt(nebula[turn].match(/\d+/)[0]) - 1;
+        if(!n) game[t].buf = game[t].buf.filter(b => !b[turn].match(/Nebula/));
+        else {
+          nebula[turn] = "Nebula " + n;
+          if(nebula[2] == "") nebula[1 - turn] = nebula[turn];
+        }
+      }
+    }
+
+    function upp(word){
+      return word[0].toUpperCase() + word.slice(1);
+    }
+
+    function unk(word){
+      return word == "res" ? "???" : upp(word);
     }
 
     async function step(data){
@@ -194,15 +232,6 @@ async function theGame(socket, uuid, room){
       if(!(from >= 0 && from <= 5)) return false;
 
       const nebula = game[t].buf.find(b => b[turn].match(/Nebula/));
-      if(nebula){
-        const n = parseInt(nebula[turn].match(/\d+/)[0]) - 1;
-        if(!n) game[t].buf = game[t].buf.filter(b => !b[turn].match(/Nebula/));
-        else {
-          nebula[turn] = "Nebula " + n;
-          if(nebula[2] == "") nebula[1 - turn] = nebula[turn];
-        }
-      }
-
       const lutum = game[t].deb.find(b => b[turn].match(/Lutum/));
 
       const newc = ["res", "res", ""];
@@ -219,6 +248,14 @@ async function theGame(socket, uuid, room){
           }
           comm.push(card);
           game[t].cards.push(newc);
+
+          game[t].log = [
+            unk(card[0]) + " > Commutatio",
+            unk(card[1]) + " > Commutatio"
+          ];
+          game[t].dmg = [];
+          game[y].dmg = [];
+
           return true;
         } else {
           if(loc >= comm.length) return false;
@@ -236,6 +273,14 @@ async function theGame(socket, uuid, room){
             card[2] = "";
           }
           comm[loc] = card;
+
+          game[t].log = [
+            unk(card[0]) + " > Commutatio > " + unk(com[0]),
+            unk(card[1]) + " > Commutatio > " + unk(com[1])
+          ];
+          game[t].dmg = [];
+          game[y].dmg = [];
+
           return true;
         }
       } else if(to == "tab"){
@@ -253,6 +298,14 @@ async function theGame(socket, uuid, room){
           }
           game[t].tab.push(card);
           game[t].cards.push(newc);
+
+          game[t].log = [
+            unk(card[0]) + " > Tabula Alchimiae",
+            unk(card[1]) + " > Tabula Alchimiae"
+          ];
+          game[t].dmg = [];
+          game[y].dmg = [];
+
           return true;
         } else if (game[t].tab.length == 1){
           const [l, r] = [game[t].tab[0][turn], game[t].cards[from][turn]];
@@ -293,6 +346,14 @@ async function theGame(socket, uuid, room){
           game[t].tab = [];
           game[t].cards.push(newc);
 
+          if(!nebula && card[2] != "?") card[1 - turn] = card[turn];
+          game[t].log = [
+            unk(card[0]) + " > Tabula Alchimiae > " + unk(newc[0]),
+            unk(card[1]) + " > Tabula Alchimiae > " + unk(newc[1])
+          ];
+          game[t].dmg = [];
+          game[y].dmg = [];
+
           return true;
         }
       } else if(to == "you"){
@@ -305,7 +366,7 @@ async function theGame(socket, uuid, room){
         else if(l == "tempestas") ef = "aer";
         else if(l == "vapor") ef = "aqua";
         else if(l == "tremor") ef = "terra";
-        else if(l == "nebula") len = 2;
+        else if(l == "nebula") len = 3;
         else if(l == "lumen"){ ef = "vita"; len = 3; }
         else if(l == "mediocris"){ ef = "aer"; len = 3; }
         else if(l == "phoenix"){ ef = "ignis"; len = 3; }
@@ -315,11 +376,24 @@ async function theGame(socket, uuid, room){
         game[t].cards.push(newc);
 
         if(ef == "vita"){
-          game[t].hp = Math.min(game[t].hp + 2 * len, 40);
+          game[t].hp = Math.min(game[t].hp + 2 * len, 50);
+
+          game[t].dmg = [[
+            "+" + (2 * len) + "HP",
+            "+" + (2 * len) + "HP"
+          ]];
+          game[y].dmg = [];
+
+          if(!nebula && card[2] != "?") card[1 - turn] = card[turn];
+          game[t].log = [
+            unk(card[0]) + " > BUF",
+            unk(card[1]) + " > BUF"
+          ];
+
           return true;
         }
 
-        ef = ef[0].toUpperCase() + ef.slice(1);
+        ef = upp(ef);
         const effect = game[t].buf.find(b => b[turn].includes(ef));
         if(effect){
           const n = parseInt(effect[turn].match(/\d+/)[0]) + len;
@@ -331,12 +405,21 @@ async function theGame(socket, uuid, room){
           if(effect[2] == "") effect[1 - turn] = effect[turn];
         } else {
           const eff = [ef + " " + len, ef + " " + len, ""];
-          if(nebula){
+          if(nebula || card[2] == "?"){
             eff[2] = "?";
             eff[1 - turn] = "???";
           }
           game[t].buf.push(eff);
         }
+
+        game[t].log = [
+          ef + " > BUF",
+          ef + " > BUF"
+        ];
+        if(nebula || card[2] == "?") game[t].log[1 - turn] = "??? > BUF";
+        game[t].dmg = [];
+        game[y].dmg = [];
+
         return true;
       } else if(to == "oppo"){
 
@@ -345,10 +428,10 @@ async function theGame(socket, uuid, room){
         let ef = l;
         let len = 1;
         let str = 2;
-        if(l == "fulgur"){ ef = "ignis"; str = 6; }
-        else if(l == "tempestas"){ ef = "aer"; str = 6; }
-        else if(l == "vapor"){ ef = "aqua"; str = 6; }
-        else if(l == "tremor"){ ef = "terra"; str = 6; }
+        if(l == "fulgur"){ ef = "ignis"; str = 8; }
+        else if(l == "tempestas"){ ef = "aer"; str = 8; }
+        else if(l == "vapor"){ ef = "aqua"; str = 8; }
+        else if(l == "tremor"){ ef = "terra"; str = 8; }
         else if(l == "vita") str = 1;
         else if(l == "lutum") len = 2;
         else if(l == "lumen"){ ef = "vita"; str = 4; }
@@ -361,6 +444,18 @@ async function theGame(socket, uuid, room){
 
         if(ef == "vita"){
           game[y].hp = Math.max(game[y].hp - str, 0);
+
+          game[y].dmg = [[
+            "-" + str + "HP (vita)",
+            "-" + str + "HP (vita)"
+          ]];
+          game[t].dmg = [];
+
+          game[t].log = [
+            unk(card[turn]) + " > DEBUF",
+            unk(card[turn]) + " > DEBUF"
+          ];
+
           return true;
         }
 
@@ -382,6 +477,16 @@ async function theGame(socket, uuid, room){
             }
             game[y].deb.push(eff);
           }
+
+          game[t].dmg = [];
+          game[y].dmg = [];
+
+          if(!nebula && card[2] != "?") card[1 - turn] = card[turn];
+          game[t].log = [
+            unk(card[0]) + " > DEBUF",
+            unk(card[1]) + " > DEBUF"
+          ];
+
           return true;
         }
         if(ef == "lutum"){
@@ -402,8 +507,26 @@ async function theGame(socket, uuid, room){
             }
             game[y].deb.push(eff);
           }
+
+          game[t].dmg = [];
+          game[y].dmg = [];
+
+          if(!nebula && card[2] != "?") card[1 - turn] = card[turn];
+          game[t].log = [
+            unk(card[0]) + " > DEBUF",
+            unk(card[1]) + " > DEBUF"
+          ];
+
           return true;
         }
+
+        game[t].dmg = [];
+        game[y].dmg = [];
+        if(!nebula && card[2] != "?") card[1 - turn] = card[turn];
+        game[t].log = [
+          unk(card[0]) + " > DEBUF",
+          unk(card[1]) + " > DEBUF"
+        ];
 
         const lutum = game[y].buf.find(b => b[1 - turn].match(/Lutum/));
         if(lutum){
@@ -456,11 +579,17 @@ async function theGame(socket, uuid, room){
             }
           }
 
+          game[t].dmg = [];
+          game[y].dmg = [[
+            "-" + str + "HP (" + unk(card[0]) + ")",
+            "-" + str + "HP (" + unk(card[1]) + ")"
+          ]];
+
           game[y].hp = Math.max(game[y].hp - str, 0);
           return true;
         }
 
-        ef = ef[0].toUpperCase() + ef.slice(1);
+        ef = upp(ef);
         const effect = game[y].deb.find(b => b[turn].includes(ef));
         if(effect){
           const n = parseInt(effect[turn].match(/\d+/)[0]) + len;

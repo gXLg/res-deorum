@@ -16,11 +16,6 @@
         margin: 0px;
       }
 
-      #start {
-        width: 100%;
-        height: 100%;
-      }
-
       #all {
         width: 100%;
         height: 100%;
@@ -54,6 +49,12 @@
       #you_stats, #oppo_stats {
         position: absolute;
         background-color: rgba(0, 0, 0, 0.4);
+        color: white;
+        text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
       }
 
       @media screen and (orientation: portrait) {
@@ -71,7 +72,6 @@
         .cc > td > img { width: 18vw; }
 
         #you_stats { bottom: 20vh; height: 10vh; }
-
         #oppo_stats { top: 20vh; height: 10vh; }
 
       }
@@ -222,6 +222,16 @@
                   ) ? "<span class=\"nebula\">" + e[i].slice(1) + "</span>" : e[i];
                 } else { de.innerHTML = ""; }
               }
+            } else if(d.match(/log/)){
+              const e = data[d];
+              document.getElementById(d).innerHTML = e ?? "";
+            } else if(d.match(/dmg/)){
+              const e = data[d];
+              for(let i = 0; i < 5; i ++){
+                const id = d + "_" + i;
+                const de = document.getElementById(id);
+                de.innerHTML = e[i] ?? "";
+              }
             } else {
               const e = data[d];
               for(let i = 0; i < (d.match(/tab/) ? 2 : 5); i ++){
@@ -312,7 +322,7 @@
   </head>
 
   <body>
-    <div id="start">
+    <div>
       <h1>Res Deorum</h1>
       <h2>Everything is in your hands.</h2>
       <img style="height:min(80vw,40vh)" src="img/manus.jpg"/><br>
@@ -373,6 +383,11 @@
         <tr>
           <th>HP</th>
           <td id="you_hp"></td>
+          <td id="you_dmg_0"></td>
+          <td id="you_dmg_1"></td>
+          <td id="you_dmg_2"></td>
+          <td id="you_dmg_3"></td>
+          <td id="you_dmg_4"></td>
         </tr>
         <tr>
           <th>BUF</th>
@@ -392,12 +407,20 @@
           <td id="you_debuf_4"></td>
           <td id="you_debuf_5"></td>
         </tr>
+        <tr>
+          <td></td><td id="you_log"></td>
+        </tr>
       </table>
 
       <table id="oppo_stats">
         <tr>
           <th>HP</th>
           <td id="oppo_hp"></td>
+          <td id="oppo_dmg_0"></td>
+          <td id="oppo_dmg_1"></td>
+          <td id="oppo_dmg_2"></td>
+          <td id="oppo_dmg_3"></td>
+          <td id="oppo_dmg_4"></td>
         </tr>
         <tr>
           <th>BUF</th>
@@ -416,6 +439,9 @@
           <td id="oppo_debuf_3"></td>
           <td id="oppo_debuf_4"></td>
           <td id="oppo_debuf_5"></td>
+        </tr>
+        <tr>
+          <td></td><td id="oppo_log"></td>
         </tr>
       </table>
 
