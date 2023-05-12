@@ -53,6 +53,10 @@ Ignis     Terra
   \>  Aer  /^
 ```
 
+This means, to protect yourself from one element, you
+have to use the stronger element. For example, to protect
+yourself from Ignis, use Aqua.
+
 Recipes:
 
 Stronger:
@@ -89,3 +93,14 @@ Use on opponent:
 * Nebula: next attack can not be resisted, but has 30% chance
 that will miss (but Lutum still works)
 * Lutum: cannot use alchemy in the next 2 moves
+
+# Mechanics
+
+Pretty simple: when it's your turn, your statistics table glows up.
+To make a turn, first click a card in your deck, then if you want -
+
+* to attack: click on opponent's statistics table
+* to use on you: click your own
+* to put to Tabula Alchimiae: click the table image
+* to put to Commutatio: click the exchange image
+* to change the card with one from Commutatio: click on the card
