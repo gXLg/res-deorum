@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,9 +31,8 @@
       #middle {
         width: 100%;
         position: absolute;
-        top: 35vh;
+        top: 37vh;
         height: 25vh;
-        -background: #33ff66;
       }
 
       td > img { border-radius: 10px; }
@@ -40,13 +40,13 @@
       .mp {
         height: 23vh;
       }
-      .mc { position: absolute; height: 25vh; top: 35vh; }
+      .mc { position: absolute; height: 25vh; top: 37vh; }
 
       .cards { position: absolute; height: 20vh; }
       #oppo { top: 0vh; }
       #you { bottom: 0vh; }
 
-      #you_stats, #oppo_stats {
+      #you_stats, #oppo_stats, #you_log, #oppo_log {
         position: absolute;
         background-color: rgba(0, 0, 0, 0.4);
         color: white;
@@ -55,6 +55,10 @@
           1px -1px 0 #000,
           -1px 1px 0 #000,
           1px 1px 0 #000;
+      }
+
+      #you_log, #oppo_log {
+        text-align: center;
       }
 
       @media screen and (orientation: portrait) {
@@ -73,6 +77,9 @@
 
         #you_stats { bottom: 20vh; height: 10vh; }
         #oppo_stats { top: 20vh; height: 10vh; }
+
+        #you_log { bottom: 32vh; width: 100vw; height: 3vh; line-height: 3vh; }
+        #oppo_log { top: 32vh; width: 100vw; height: 3vh; line-height: 3vh; }
 
       }
 
@@ -98,6 +105,15 @@
           top: 0vh;
           left: 50vw;
           height: 25vh;
+        }
+
+        #you_log {
+          bottom: 30vh; width: 50vw; height: 5vh;
+          line-height: 5vh; right: 0vw;
+        }
+        #oppo_log {
+          top: 30vh; width: 50vw; height: 5vh;
+          line-height: 5vh; right: 0vw;
         }
 
       }
@@ -407,9 +423,6 @@
           <td id="you_debuf_4"></td>
           <td id="you_debuf_5"></td>
         </tr>
-        <tr>
-          <td></td><td id="you_log"></td>
-        </tr>
       </table>
 
       <table id="oppo_stats">
@@ -440,10 +453,10 @@
           <td id="oppo_debuf_4"></td>
           <td id="oppo_debuf_5"></td>
         </tr>
-        <tr>
-          <td></td><td id="oppo_log"></td>
-        </tr>
       </table>
+
+      <div id="you_log"></div>
+      <div id="oppo_log"></div>
 
     </div>
   </body>
