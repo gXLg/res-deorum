@@ -59,7 +59,7 @@ yourself from Ignis, use Aqua.
 
 Recipes:
 
-Stronger:
+Stronger (first listed element gets stronger):
 * Ignis + Aer   = Fulgur    (Lightning)
 * Aqua  + Ignis = Vapor     (Steam)
 * Aer   + Terra = Tempestas (Storm)
