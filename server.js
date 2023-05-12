@@ -18,11 +18,11 @@ const io = new Server(server, { "cors": { "origin": "*" } });
 function getCards(n){
   const a = [...Array(n)].map(() => {
     const r = Math.floor(Math.random() * 100);
-    if(r < 8 + 23 * 0) return "vita";
-    if(r < 8 + 23 * 1) return "ignis";
-    if(r < 8 + 23 * 2) return "aqua";
-    if(r < 8 + 23 * 3) return "aer";
-    if(r < 8 + 23 * 4) return "terra";
+    if(r < 12 + 22 * 0) return "vita";
+    if(r < 12 + 22 * 1) return "ignis";
+    if(r < 12 + 22 * 2) return "aqua";
+    if(r < 12 + 22 * 3) return "aer";
+    if(r < 12 + 22 * 4) return "terra";
   });
   return n == 1 ? a[0] : a;
 }

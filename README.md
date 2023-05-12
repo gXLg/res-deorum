@@ -15,8 +15,8 @@ Five base elements: Ignis, Aqua, Aer, Terra, Vita
 
 In begin:
 * Infinitely cards in deck
-* For each element: 23%
-* Vita: 8%
+* For each element: 22%
+* Vita: 12%
 * Two players, each gets 5 cards
 
 Each turn:
