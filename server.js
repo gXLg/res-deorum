@@ -38,7 +38,7 @@ function getCards(n, elements){
   const a = [...Array(n)].map(() => {
     const e = get();
     if(el.has(e)) return get();
-    return el;
+    return e;
   });
   return n == 1 ? a[0] : a;
 }
