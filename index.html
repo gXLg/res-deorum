@@ -312,6 +312,7 @@
               select(null);
             } else comm(null);
           }
+          ys.classList.remove("glow");
         }
 
         function move(d){
@@ -319,6 +320,7 @@
           if(sel == null) return;
           socket.emit("turn", [sel, d, null]);
           select(null);
+          ys.classList.remove("glow");
         }
 
       }

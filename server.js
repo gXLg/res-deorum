@@ -15,14 +15,30 @@ const app = express();
 const server = https.createServer(cred, app);
 const io = new Server(server, { "cors": { "origin": "*" } });
 
-function getCards(n){
-  const a = [...Array(n)].map(() => {
+function getCards(n, elements){
+  const EL = [
+    "ignis", "aqua", "aer", "terra",
+    "fulgur", "vapor", "tempestas", "tremor"
+  ];
+  const el = new Set(elements.filter(
+    e => ![
+      "phoenix", "syrena", "vita", "nebula",
+      "mediocris", "colossus", "lumen", "lutum"].includes(e)
+    ).map(e => EL.at(EL.indexOf(e) / 2)));
+
+  function get(){
     const r = Math.floor(Math.random() * 100);
     if(r < 12 + 22 * 0) return "vita";
     if(r < 12 + 22 * 1) return "ignis";
     if(r < 12 + 22 * 2) return "aqua";
     if(r < 12 + 22 * 3) return "aer";
     if(r < 12 + 22 * 4) return "terra";
+  }
+
+  const a = [...Array(n)].map(() => {
+    const e = get();
+    if(el.has(e)) return get();
+    return el;
   });
   return n == 1 ? a[0] : a;
 }
@@ -81,7 +97,7 @@ async function theGame(socket, uuid, room){
         "hp": 50,
         "buf": [],
         "deb": [],
-        "cards": getCards(5).map(c => [c, "res", ""]),
+        "cards": getCards(5, []).map(c => [c, "res", ""]),
         "tab": [],
         "log": [],
         "dmg": []
@@ -90,7 +106,7 @@ async function theGame(socket, uuid, room){
         "hp": 50,
         "buf": [],
         "deb": [],
-        "cards": getCards(5).map(c => ["res", c, ""]),
+        "cards": getCards(5, []).map(c => ["res", c, ""]),
         "tab": [],
         "log": [],
         "dmg": []
@@ -235,7 +251,7 @@ async function theGame(socket, uuid, room){
       const lutum = game[t].deb.find(b => b[turn].match(/Lutum/));
 
       const newc = ["res", "res", ""];
-      newc[turn] = getCards(1);
+      newc[turn] = getCards(1, game[t].cards.map(c => c[turn]));
 
       if(to == "com"){
         if(loc == null){
@@ -379,8 +395,8 @@ async function theGame(socket, uuid, room){
           game[t].hp = Math.min(game[t].hp + 3 * len, 50);
 
           game[t].dmg = [[
-            "+" + (2 * len) + "HP",
-            "+" + (2 * len) + "HP"
+            "+" + (3 * len) + "HP",
+            "+" + (3 * len) + "HP"
           ]];
           game[y].dmg = [];
 
@@ -413,8 +429,8 @@ async function theGame(socket, uuid, room){
         }
 
         game[t].log = [
-          ef + " > BUF",
-          ef + " > BUF"
+          unk(card[0]) + " > BUF",
+          unk(card[1]) + " > BUF"
         ];
         if(nebula || card[2] == "?") game[t].log[1 - turn] = "??? > BUF";
         game[t].dmg = [];
