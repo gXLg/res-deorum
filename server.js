@@ -16,15 +16,18 @@ const server = https.createServer(cred, app);
 const io = new Server(server, { "cors": { "origin": "*" } });
 
 function getCards(n, elements){
+
+  console.log(elements);
+
   const EL = [
     "ignis", "aqua", "aer", "terra",
     "fulgur", "vapor", "tempestas", "tremor"
   ];
-  const el = new Set(elements.filter(
+  const el = elements.filter(
     e => ![
       "phoenix", "syrena", "vita", "nebula",
       "mediocris", "colossus", "lumen", "lutum"].includes(e)
-    ).map(e => EL.at(EL.indexOf(e) / 2)));
+    ).map(e => EL.at(EL.indexOf(e) % 4));
 
   function get(){
     const r = Math.floor(Math.random() * 100);
@@ -35,10 +38,15 @@ function getCards(n, elements){
     if(r < 12 + 22 * 4) return "terra";
   }
 
+  const c = { };
+  el.forEach(e => c[e] = el.filter(i => i == e).length);
+
   const a = [...Array(n)].map(() => {
-    const e = get();
-    if(el.has(e)) return get();
-    return e;
+    while(true){
+      const e = get();
+      if(!c[e]) return e;
+      c[e] --;
+    }
   });
   return n == 1 ? a[0] : a;
 }
