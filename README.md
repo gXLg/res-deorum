@@ -29,7 +29,8 @@ Using a card:
 * Use on enemy
 * Put to "Tabula Alchimiae"
 * Use on self
-* Put into "Commutatio"
+* Put into "Commutatio", uaing Commutatio does not use your turn,
+but this can only be used once in a turn
 
 Exchange:
 * Open cards in the "Commutatio", which can be added

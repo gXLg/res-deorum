@@ -17,8 +17,6 @@ const io = new Server(server, { "cors": { "origin": "*" } });
 
 function getCards(n, elements){
 
-  console.log(elements);
-
   const EL = [
     "ignis", "aqua", "aer", "terra",
     "fulgur", "vapor", "tempestas", "tremor"
@@ -98,6 +96,7 @@ async function theGame(socket, uuid, room){
     const con = { oppo, socket };
 
     let turn = Math.floor(Math.random() * 2);
+    let comed = false;
 
     const comm = [];
     const game = {
@@ -262,6 +261,7 @@ async function theGame(socket, uuid, room){
       newc[turn] = getCards(1, game[t].cards.map(c => c[turn]));
 
       if(to == "com"){
+        if(comed) return false;
         if(loc == null){
           if(comm.length == 5) return false;
           const card = game[t].cards.splice(from, 1)[0];
@@ -280,7 +280,9 @@ async function theGame(socket, uuid, room){
           game[t].dmg = [];
           game[y].dmg = [];
 
-          return true;
+          comed = true;
+          update();
+          return false;
         } else {
           if(loc >= comm.length) return false;
           const com = comm[loc];
@@ -305,7 +307,9 @@ async function theGame(socket, uuid, room){
           game[t].dmg = [];
           game[y].dmg = [];
 
-          return true;
+          comed = true;
+          update();
+          return false;
         }
       } else if(to == "tab"){
 
@@ -440,7 +444,7 @@ async function theGame(socket, uuid, room){
           unk(card[0]) + " > BUF",
           unk(card[1]) + " > BUF"
         ];
-        if(nebula || card[2] == "?") game[t].log[1 - turn] = "??? > BUF";
+        if(!nebula && card[2] != "?") game[t].log[1 - turn] = card[turn];
         game[t].dmg = [];
         game[y].dmg = [];
 
@@ -674,6 +678,7 @@ async function theGame(socket, uuid, room){
         working = false;
         if(!succ) return;
 
+        comed = false;
         reduce();
         turn = 0;
         update();
@@ -728,6 +733,7 @@ async function theGame(socket, uuid, room){
         working = false;
         if(!succ) return;
 
+        comed = false;
         reduce();
         turn = 1;
         update();
