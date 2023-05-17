@@ -449,7 +449,7 @@ async function theGame(socket, uuid, room){
           game[t].buf.push(eff);
         }
 
-        if(!nebula && card[2] != "?") game[t].card[1 - turn] = card[turn];
+        if(!nebula && card[2] != "?") card[1 - turn] = card[turn];
         game[t].log = [
           unk(card[0]) + " > BUF",
           unk(card[1]) + " > BUF"
