@@ -78,7 +78,10 @@ io.on("connection", async socket => {
 
 async function theGame(socket, uuid, room){
 
-  if(online.has(uuid)) return;
+  if(online.has(uuid)){
+    socket.disconnect();
+    return;
+  }
   online.add(uuid);
   socket.on("disconnect", () => online.delete(uuid));
 
