@@ -54,6 +54,8 @@ const games = { };
 const rooms = { };
 const ids = { };
 
+const online = new Set();
+
 io.on("connection", async socket => {
   console.log("Connected", socket.id);
   socket.on("disconnect", () => {
@@ -75,6 +77,10 @@ io.on("connection", async socket => {
 });
 
 async function theGame(socket, uuid, room){
+
+  if(online.has(uuid)) return;
+  online.add(uuid);
+  socket.on("disconnect", () => online.delete(uuid));
 
   rooms[socket.id] = room;
   ids[socket.id] = uuid;
