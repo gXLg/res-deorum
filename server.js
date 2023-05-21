@@ -18,14 +18,14 @@ const io = new Server(server, { "cors": { "origin": "*" } });
 function getCards(n, elements){
 
   const EL = [
-    "ignis", "aqua", "aer", "terra",
-    "fulgur", "vapor", "tempestas", "tremor"
+    "ignis", "aqua", "aer", "terra", "vita",
+    "fulgur", "vapor", "tempestas", "tremor", "lumen"
   ];
   const el = elements.filter(
     e => ![
-      "phoenix", "syrena", "vita", "nebula",
-      "mediocris", "colossus", "lumen", "lutum"].includes(e)
-    ).map(e => EL.at(EL.indexOf(e) % 4));
+      "phoenix", "syrena", "nebula",
+      "mediocris", "colossus", "lutum"].includes(e)
+    ).map(e => EL[EL.indexOf(e) % 5]);
 
   function get(){
     const r = Math.floor(Math.random() * 100);
@@ -538,7 +538,7 @@ async function theGame(socket, uuid, room){
             if(effect[2] == "") effect[1 - turn] = effect[turn];
           } else {
             const eff = ["Lutum " + len, "Lutum " + len, ""];
-            if(nebula){
+            if(nebula || card[2] == "?"){
               eff[2] = "?";
               eff[1 - turn] = "???";
             }
@@ -638,7 +638,7 @@ async function theGame(socket, uuid, room){
           if(effect[2] == "") effect[1 - turn] = effect[turn];
         } else {
           const eff = [ef + " " + len, ef + " " + len, ""];
-          if(nebula){
+          if(nebula || card[2] == "?"){
             eff[2] = "?";
             eff[1 - turn] = "???";
           }
