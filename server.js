@@ -18,14 +18,11 @@ const io = new Server(server, { "cors": { "origin": "*" } });
 function getCards(n, elements){
 
   const EL = [
-    "ignis", "aqua", "aer", "terra", "vita",
-    "fulgur", "vapor", "tempestas", "tremor", "lumen"
+    "ignis", "aqua", "aer", "terra", "vita"
   ];
   const el = elements.filter(
-    e => ![
-      "phoenix", "syrena", "nebula",
-      "mediocris", "colossus", "lutum"].includes(e)
-    ).map(e => EL[EL.indexOf(e) % 5]);
+    e => EL.includes(e)
+  );
 
   function get(){
     const r = Math.floor(Math.random() * 100);
