@@ -1,19 +1,39 @@
 const express = require("express");
 const https = require("https");
+const http = require("http");
 const { Server } = require("socket.io");
 const fs = require("fs");
 const { randomUUID } = require("crypto");
 const { EventEmitter } = require("events");
+const os = require("os");
+
+const app = express();
+
+const httpServer = http.createServer(app);
 
 const cred = {
   "key": fs.readFileSync("./cert/privkey.pem", "utf8"),
   "cert": fs.readFileSync("./cert/fullchain.pem", "utf8")
 };
+const httpsServer = https.createServer(cred, app);
 
-const app = express();
 
-const server = https.createServer(cred, app);
-const io = new Server(server, { "cors": { "origin": "*" } });
+function ready(ty, p){
+  console.log(ty, "server started!");
+  const n = os.networkInterfaces();
+  console.log("Local IPs:");
+  for(const int in n){
+    const nt = n[int];
+    console.log("*", nt.map(t => ty + "://" + t.address + ":" + p).join(" | "));
+  }
+}
+
+httpsServer.listen(11069, () => ready("https", 11069));
+httpServer.listen(11269, () => ready("http", 11269));
+
+const io = new Server({ "cors": { "origin": "*" } });
+io.attach(httpServer);
+io.attach(httpsServer);
 
 function getCards(n, elements){
 
@@ -766,10 +786,6 @@ async function theGame(socket, uuid, room){
   }
 }
 
-server.listen(11069, () => {
-  console.log("Server started!");
-});
-
 let ctrlC = false;
 process.on("SIGINT", async () => {
   if(ctrlC) return;
@@ -777,7 +793,9 @@ process.on("SIGINT", async () => {
 
   console.log("\rStopping...");
 
+  httpServer.close();
+  httpsServer.close();
+
   io.close();
 
 });
-

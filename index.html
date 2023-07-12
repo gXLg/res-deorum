@@ -136,7 +136,6 @@
 
     </style>
 
-    <script src="https://kemuri.ddns.net:11069/socket.io/socket.io.js"></script>
     <script>
       window.onload = () => {
 
@@ -157,19 +156,27 @@
       let socket;
       let turn;
 
-      function game(){
+      async function game(){
+        try { await game_wrapped(); }
+        catch(err) { alert("Cannot connect to the game server :("); 
+        console.error(err); }
+      }
+
+      async function game_wrapped(){
+
+        const a = document.getElementById("address").value;
+        const address = a || "https://kemuri.ddns.net:11069";
+
+        const r = await fetch(address + "/socket.io/socket.io.js");
+        const s = await r.text();
+        eval(s);
 
         const room = document.getElementById("room").value;
 
-        try {
-          socket = io("https://kemuri.ddns.net:11069");
-          const id = localStorage.getItem("uuid");
-          if(!id) socket.emit("first");
-          else socket.emit("login", id, room);
-        } catch(err) {
-          alert("Cannot connect to the game server :(");
-          return;
-        }
+        socket = io(address);
+        const id = localStorage.getItem("uuid");
+        if(!id) socket.emit("first");
+        else socket.emit("login", id, room);
 
         const g = document.getElementById("game_btn");
         g.disabled = true;
@@ -347,7 +354,8 @@
       <span id="waiting" class="h">Waiting for an opponent...</span>
       <input type="button" value="enter" id="enter_btn" onclick="full()">
       <input type="button" value="leave" id="leave_btn" onclick="exit()"><br>
-      <input type="text" id="room" placeholder="private room code">
+      <input type="text" id="room" placeholder="private room code"><br>
+      <input type="text" id="address" placeholder="custom server">
     </div>
     <div id="all" class="h">
       <table id="middle">
