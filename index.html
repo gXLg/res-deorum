@@ -197,9 +197,14 @@
       let turn;
 
       async function game(){
+        const g = document.getElementById("game_btn");
+        g.disabled = true;
         try { await game_wrapped(); }
-        catch(err) { alert("Cannot connect to the game server :("); 
-        console.error(err); }
+        catch(err) {
+          alert("Cannot connect to the game server :(");
+          console.error(err);
+          g.disabled = false;
+        }
       }
 
       async function game_wrapped(){
@@ -219,7 +224,7 @@
         else socket.emit("login", id, room);
 
         const g = document.getElementById("game_btn");
-        g.disabled = true;
+
         const w = document.getElementById("waiting");
         w.classList.remove("h");
         const e = document.getElementById("enter_btn");
