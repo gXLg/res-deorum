@@ -17,16 +17,20 @@
         margin: 0px;
       }
 
-      #load {
+      .cont {
         width: 100%;
         height: 100%;
         text-align: center;
         background: #5F4335;
       }
-      #l {
+      #load {
         position: relative;
-        top: 48%;
+        top: 30%;
       }
+      h1, h2 {
+        margin: 0px;
+      }
+
 
       #table {
         width: 100%;
@@ -391,22 +395,22 @@
   </head>
 
   <body>
-    <div id="load">
-      <div id="l">
+    <div class="cont">
+      <h1>Res Deorum</h1>
+      <h2>Everything is in your hands.</h2>
+      <div id="load">
         Loading... <span id="prog">0%</span>
         <img id="imgloader" width="0" height="0"/>
       </div>
-    </div>
-    <div id="game" class="h">
-      <h1>Res Deorum</h1>
-      <h2>Everything is in your hands.</h2>
-      <img style="height:min(80vw,40vh)" src="img/manus.jpg"/><br>
-      <input type="button" value="play" id="game_btn" onclick="game()">
-      <span id="waiting" class="h">Waiting for an opponent...</span>
-      <input type="button" value="enter" id="enter_btn" onclick="full()">
-      <input type="button" value="leave" id="leave_btn" onclick="exit()"><br>
-      <input type="text" id="room" placeholder="private room code"><br>
-      <input type="text" id="address" placeholder="custom server">
+      <div id="game" class="h">
+        <img style="height:min(80vw,40vh)" src="img/manus.jpg"/><br>
+        <input type="button" value="play" id="game_btn" onclick="game()">
+        <span id="waiting" class="h">Waiting for an opponent...</span>
+        <input type="button" value="enter" id="enter_btn" onclick="full()">
+        <input type="button" value="leave" id="leave_btn" onclick="exit()"><br>
+        <input type="text" id="room" placeholder="private room code"><br>
+        <input type="text" id="address" placeholder="custom server">
+      </div>
     </div>
     <div id="table" class="h">
       <table id="middle">
