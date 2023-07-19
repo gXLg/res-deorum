@@ -281,12 +281,12 @@
         });
 
         socket.on("win", () => {
-          socket.disconnect();
           popup("[VICTORY] You beat your opponent!");
+          socket.disconnect();
         });
         socket.on("lose", () => {
-          socket.disconnect();
           popup("[DEFEAT] You was beaten!");
+          socket.disconnect();
         });
 
         socket.on("update", data => {
