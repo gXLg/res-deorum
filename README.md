@@ -91,8 +91,7 @@ Use on opponent:
 * Elements: dmg 2 HP if not resist effect else resist effect reduce
 * Stronger: dmg 8 HP if not ...^
 * Longer: dmg 3 HP for the next 3 rounds (effects mechanics still apply)
-* Nebula: next attack can not be resisted, but has 30% chance
-that will miss (but Lutum still works)
+* Nebula: next attack can not be resisted (but Lutum still works)
 * Lutum: cannot use alchemy in the next 2 moves
 
 # Mechanics

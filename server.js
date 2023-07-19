@@ -603,8 +603,6 @@ async function theGame(socket, uuid, room){
               nebula[turn] = "Nebula " + n;
               if(nebula[2] == "") nebula[1 - turn] = nebula[turn];
             }
-            if(Math.floor(Math.random() * 100) < 30) return true;
-
           } else {
             let dis = false;
             let dec;
