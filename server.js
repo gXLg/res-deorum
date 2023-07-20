@@ -762,13 +762,13 @@ async function theGame(socket, uuid, room){
         turn = 1;
         update();
 
-        if(game.oppo.hp == 0){
+        if(game.socket.hp == 0){
           con.oppo.emit("lose");
           con.socket.emit("win");
           exit();
           return;
         }
-        if(game.socket.hp == 0){
+        if(game.oppo.hp == 0){
           con.oppo.emit("win");
           con.socket.emit("lose");
           exit();
