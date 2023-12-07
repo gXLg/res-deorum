@@ -388,14 +388,17 @@
 
         function move(d){
           if(turn == 1) return;
-          let lutum = false;
-          for(let i = 0; i < 6; i++){
-            if(document.getElementById("you_debuf_" + i).innerText.includes("Lutum")){
-              lutum = true;
-              break;
+          if(d == "tab"){
+            let lutum = false;
+            for(let i = 0; i < 6; i++){
+              if(document.getElementById("you_debuf_" + i).innerText.includes("Lutum")){
+                lutum = true;
+                break;
+              }
             }
+            if(lutum) return;
           }
-          if(lutum || sel == null) return;
+          if(sel == null) return;
           socket.emit("turn", [sel, d, null]);
           select(null);
           ys.classList.remove("glow");
