@@ -57,7 +57,11 @@
       }
       .mc { position: absolute; height: 25vh; top: 37vh; }
 
-      .cards { position: absolute; height: 20vh; }
+      .cards {
+        position: absolute;
+        height: 20vh;
+        border: outset 5px #2d1e1b;
+      }
       #oppo { top: 0vh; }
       #you { bottom: 0vh; }
 
@@ -382,7 +386,14 @@
 
         function move(d){
           if(turn == 1) return;
-          if(sel == null) return;
+          let lutum = false;
+          for(let i = 0; i < 6; i++){
+            if(document.getElementById("you_debuf_" + i).innerText.includes("Lutum"){
+              lutum = true;
+              break;
+            }
+          }
+          if(lutum || sel == null) return;
           socket.emit("turn", [sel, d, null]);
           select(null);
           ys.classList.remove("glow");
