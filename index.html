@@ -231,7 +231,7 @@
       async function game_wrapped(){
 
         const a = document.getElementById("address").value;
-        const address = a || "https://res-deorum.kemuri.life";
+        const address = a || "https://kemuri.ddns.net:11069";
 
         const r = await fetch(address + "/socket.io/socket.io.js");
         const s = await r.text();
