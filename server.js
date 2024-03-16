@@ -12,8 +12,8 @@ const app = express();
 const httpServer = http.createServer(app);
 
 const cred = {
-  "key": fs.readFileSync("./cert/privkey.pem", "utf8"),
-  "cert": fs.readFileSync("./cert/fullchain.pem", "utf8")
+  "key": fs.readFileSync("../certs/kemuri.life/privkey.pem", "utf8"),
+  "cert": fs.readFileSync("../certs/kemuri.life/fullchain.pem", "utf8")
 };
 const httpsServer = https.createServer(cred, app);
 
@@ -762,13 +762,13 @@ async function theGame(socket, uuid, room){
         turn = 1;
         update();
 
-        if(game.socket.hp == 0){
+        if(game.oppo.hp == 0){
           con.oppo.emit("lose");
           con.socket.emit("win");
           exit();
           return;
         }
-        if(game.oppo.hp == 0){
+        if(game.socket.hp == 0){
           con.oppo.emit("win");
           con.socket.emit("lose");
           exit();
