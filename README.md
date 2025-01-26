@@ -7,10 +7,6 @@ but needed a small project to entertain myself
 
 The game is accessible here: [github pages](https://gxlg.github.io/res-deorum/).
 
-~~If the server is not reachable, that means I restarted my server
-and forgot to host the game. Please contact me on Discord about this.~~
-I stopped hosting the game, so you will have to run your own server in order to play.
-
 # Elements
 
 Five base elements: Ignis, Aqua, Aer, Terra, Vita

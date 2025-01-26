@@ -1,0 +1,5 @@
+{
+  "ram": 100,
+  "record": "res-deorum.gxlg.dev",
+  "start": "node --max-old-space-size=100 server.js {port}"
+}

@@ -1,5 +1,6 @@
+const port = parseInt(process.argv[2]);
+
 const express = require("express");
-const https = require("https");
 const http = require("http");
 const { Server } = require("socket.io");
 const fs = require("fs");
@@ -11,13 +12,6 @@ const app = express();
 
 const httpServer = http.createServer(app);
 
-const cred = {
-  "key": fs.readFileSync("../certs/kemuri.life/privkey.pem", "utf8"),
-  "cert": fs.readFileSync("../certs/kemuri.life/fullchain.pem", "utf8")
-};
-const httpsServer = https.createServer(cred, app);
-
-
 function ready(ty, p){
   console.log(ty, "server started!");
   const n = os.networkInterfaces();
@@ -28,12 +22,10 @@ function ready(ty, p){
   }
 }
 
-httpsServer.listen(11069, () => ready("https", 11069));
-httpServer.listen(11269, () => ready("http", 11269));
+httpServer.listen(port, () => ready("http", port));
 
 const io = new Server({ "cors": { "origin": "*" } });
 io.attach(httpServer);
-io.attach(httpsServer);
 
 function getCards(n, elements){
 
@@ -792,7 +784,6 @@ process.on("SIGINT", async () => {
   console.log("\rStopping...");
 
   httpServer.close();
-  httpsServer.close();
 
   io.close();
 
