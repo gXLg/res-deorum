@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/gXLg/res-deorum#readme",
   "dependencies": {
-    "express": "^4.18.2",
-    "socket.io": "^4.7.1"
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
   }
 }
